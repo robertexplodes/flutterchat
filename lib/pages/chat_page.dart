@@ -24,13 +24,20 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   var controller = TextEditingController();
 
+
+  @override
+  void initState() {
+    super.initState();
+    Provider.of<MessageProvider>(context, listen: false).loadMessages(widget.chat.id);
+  }
+
   @override
   Widget build(BuildContext context) {
     var provider = Provider.of<MessageProvider>(context);
-    Timer.periodic(
-        Duration(seconds: 3),
-        (Timer t) => Provider.of<MessageProvider>(context, listen: false)
-            .loadMessages(widget.chat.id));
+    Timer(
+      Duration(seconds: 1),
+      () => provider.reloadMessages(widget.chat.id)
+    );
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.chat.name),
@@ -45,12 +52,32 @@ class _ChatPageState extends State<ChatPage> {
         child: Column(
           children: [
             Expanded(
-              child: ListView.builder(
-                itemBuilder: (context, index) {
-                  return MessageWidget(message: provider.messages[index]);
-                },
-                itemCount: provider.messages.length,
-              ),
+              // child: FutureBuilder(
+                // future: provider.loadMessages(widget.chat.id),
+              //   builder: (BuildContext context, AsyncSnapshot<List<Message>> snapshot) {
+              //     // if(snapshot.connectionState == ConnectionState.waiting) {
+              //     //   return Center(
+              //     //     child: CircularProgressIndicator(),
+              //     //   );
+              //     // }
+              //     if(snapshot.hasError) {
+              //       return Center(
+              //         child: Text("Error: ${snapshot.error}", style: TextStyle(color: Colors.red)),
+              //       );
+              //     }
+              //
+              //     return ListView.builder(
+              //       itemBuilder: (context, index) {
+              //         return MessageWidget(message: provider.messages[index]);
+              //       },
+              //       itemCount: provider.messages.length,
+              //     );
+              //   },
+              // ),
+              child: ListView.builder(itemBuilder: (context, index) {
+                return MessageWidget(message: provider.messages[index]);
+              }, itemCount: Provider.of<MessageProvider>(context).messages.length,)
+
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
