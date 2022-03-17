@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:chat/domain/message.dart';
@@ -11,18 +12,28 @@ import 'package:provider/provider.dart';
 
 import '../domain/chat.dart';
 
-class ChatPage extends StatelessWidget {
+class ChatPage extends StatefulWidget {
   final Chat chat;
 
   ChatPage({Key? key, required this.chat}) : super(key: key);
 
+  @override
+  State<ChatPage> createState() => _ChatPageState();
+}
+
+class _ChatPageState extends State<ChatPage> {
   var controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    var provider = Provider.of<MessageProvider>(context);
+    Timer.periodic(
+        Duration(seconds: 3),
+        (Timer t) => Provider.of<MessageProvider>(context, listen: false)
+            .loadMessages(widget.chat.id));
     return Scaffold(
       appBar: AppBar(
-        title: Text(chat.name),
+        title: Text(widget.chat.name),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -34,32 +45,11 @@ class ChatPage extends StatelessWidget {
         child: Column(
           children: [
             Expanded(
-              child: FutureBuilder(
-                future: Provider.of<MessageProvider>(context, listen: false)
-                    .loadMessages(chat.id),
-                builder: (BuildContext context,
-                    AsyncSnapshot<List<Message>> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
-                  }
-                  if (snapshot.hasError) {
-                    return const Text(
-                      "Could not load chats",
-                      style: TextStyle(color: Colors.white, fontSize: 20),
-                    );
-                  }
-
-                  if (snapshot.hasData) {
-                    print(snapshot.data!);
-                    return ListView.builder(
-                      itemBuilder: (context, index) {
-                        return MessageWidget(message: snapshot.data![index]);
-                      },
-                      itemCount: snapshot.data!.length,
-                    );
-                  }
-                  return SizedBox();
+              child: ListView.builder(
+                itemBuilder: (context, index) {
+                  return MessageWidget(message: provider.messages[index]);
                 },
+                itemCount: provider.messages.length,
               ),
             ),
             Padding(
@@ -76,15 +66,22 @@ class ChatPage extends StatelessWidget {
                     radius: 25,
                     child: IconButton(
                       onPressed: () {
+                        var content = controller.text;
+                        var timeStamp = DateTime.now().millisecondsSinceEpoch;
+                        controller.clear();
                         http
                             .post(
-                              Uri.parse(
-                                  '$baseURL/chats/${chat.id}/messages.json'),
-                              body: jsonEncode({
-                                "content": controller.text,
-                              }),
-                            )
-                            .then((value) => print(jsonDecode(value.body)));
+                          Uri.parse(
+                              '$baseURL/chats/${widget.chat.id}/messages.json'),
+                          body: jsonEncode(
+                              {"content": content, "time": timeStamp}),
+                        )
+                            .then((value) {
+                          var response = jsonDecode(value.body);
+                          Provider.of<MessageProvider>(context, listen: false)
+                              .addMessage(Message(
+                                  response["name"], content, timeStamp));
+                        }).catchError((error) {});
                       },
                       icon: const Icon(
                         Icons.send,

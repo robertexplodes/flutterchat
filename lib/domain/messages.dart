@@ -6,10 +6,24 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class MessageProvider with ChangeNotifier {
+  List<Message> _messages = [];
+
+  List<Message> get messages => _messages;
+
   Future<List<Message>> loadMessages(String chatId) async {
+    _messages = [];
     var response =
         await http.get(Uri.parse('$baseURL/chats/$chatId/messages.json'));
     var data = jsonDecode(response.body) as Map<String, dynamic>;
-    return data.entries.map((e) => Message(e.key, e.value["content"])).toList();
+    var messages =  data.entries.map((e) => Message(e.key, e.value["content"], e.value["time"])).toList();
+    _messages = messages;
+    _messages.sort((a, b) => a.time.compareTo(b.time));
+    notifyListeners();
+    return _messages;
+  }
+
+  void addMessage(Message newMessage) {
+    _messages.add(newMessage);
+    notifyListeners();
   }
 }

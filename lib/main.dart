@@ -24,7 +24,6 @@ void main() {
 class FlutterChat extends StatelessWidget {
   const FlutterChat({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     var chats = Provider.of<ChatProvider>(context).loadChats();
@@ -41,20 +40,21 @@ class FlutterChat extends StatelessWidget {
             }
             if (snapshot.hasError) return const Text("Could not load chats");
 
-            if (snapshot.hasData) print("hello world");
             var response = snapshot.data as List<Chat>;
             return ListView.builder(
               itemBuilder: (context, index) {
                 return GestureDetector(
                   onTap: () {
                     Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) =>
-                          ChatPage(chat: response[index]),
+                      builder: (context) => ChatPage(chat: response[index]),
                     ));
                   },
                   child: Chip(
                     label: Text(response[index].name),
-                    avatar: Text('${response[index].messages.length}'),
+                    avatar: CircleAvatar(
+                      child: Text('${response[index].messageCount}'),
+                      backgroundColor: Colors.blueAccent,
+                    ),
                   ),
                 );
               },
