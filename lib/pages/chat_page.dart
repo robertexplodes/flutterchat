@@ -24,20 +24,17 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   var controller = TextEditingController();
 
-
   @override
   void initState() {
     super.initState();
-    Provider.of<MessageProvider>(context, listen: false).loadMessages(widget.chat.id);
+    Provider.of<MessageProvider>(context, listen: false)
+        .loadMessages(widget.chat.id);
   }
 
   @override
   Widget build(BuildContext context) {
     var provider = Provider.of<MessageProvider>(context);
-    Timer(
-      Duration(seconds: 1),
-      () => provider.reloadMessages(widget.chat.id)
-    );
+    Timer(Duration(seconds: 1), () => provider.reloadMessages(widget.chat.id));
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.chat.name),
@@ -53,7 +50,7 @@ class _ChatPageState extends State<ChatPage> {
           children: [
             Expanded(
               // child: FutureBuilder(
-                // future: provider.loadMessages(widget.chat.id),
+              // future: provider.loadMessages(widget.chat.id),
               //   builder: (BuildContext context, AsyncSnapshot<List<Message>> snapshot) {
               //     // if(snapshot.connectionState == ConnectionState.waiting) {
               //     //   return Center(
@@ -74,10 +71,13 @@ class _ChatPageState extends State<ChatPage> {
               //     );
               //   },
               // ),
-              child: ListView.builder(itemBuilder: (context, index) {
-                return MessageWidget(message: provider.messages[index]);
-              }, itemCount: Provider.of<MessageProvider>(context).messages.length,)
-
+              child: ListView.builder(
+                itemBuilder: (context, index) {
+                  return MessageWidget(message: provider.messages[index]);
+                },
+                itemCount:
+                    Provider.of<MessageProvider>(context).messages.length,
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -94,21 +94,10 @@ class _ChatPageState extends State<ChatPage> {
                     child: IconButton(
                       onPressed: () {
                         var content = controller.text;
-                        var timeStamp = DateTime.now().millisecondsSinceEpoch;
+                        if (content.isEmpty) return;
                         controller.clear();
-                        http
-                            .post(
-                          Uri.parse(
-                              '$baseURL/chats/${widget.chat.id}/messages.json'),
-                          body: jsonEncode(
-                              {"content": content, "time": timeStamp}),
-                        )
-                            .then((value) {
-                          var response = jsonDecode(value.body);
-                          Provider.of<MessageProvider>(context, listen: false)
-                              .addMessage(Message(
-                                  response["name"], content, timeStamp));
-                        }).catchError((error) {});
+
+                        sendMessage(content, context);
                       },
                       icon: const Icon(
                         Icons.send,
@@ -123,5 +112,19 @@ class _ChatPageState extends State<ChatPage> {
         ),
       ),
     );
+  }
+
+  void sendMessage(String content, BuildContext context) {
+    var timeStamp = DateTime.now().millisecondsSinceEpoch;
+    http
+        .post(
+      Uri.parse('$baseURL/chats/${widget.chat.id}/messages.json'),
+      body: jsonEncode({"content": content, "time": timeStamp}),
+    )
+        .then((value) {
+      var response = jsonDecode(value.body);
+      Provider.of<MessageProvider>(context, listen: false)
+          .addMessage(Message(response["name"], content, timeStamp));
+    }).catchError((error) {});
   }
 }

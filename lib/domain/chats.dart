@@ -16,7 +16,8 @@ class ChatProvider with ChangeNotifier {
     return data.entries.map((e) {
       var value = e.value as Map<String ,dynamic>;
       var messages = value["messages"] as Map<String, dynamic>;
-      return Chat(e.key, e.value["title"], messages.entries.length);
+      var picture = e.value["picture"] as String;
+      return Chat(e.key, e.value["title"], messages.entries.length, picture);
     }).toList();
     // return data.entries
     //     .map((e) => Chat(e.key,
