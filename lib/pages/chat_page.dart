@@ -27,8 +27,8 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     super.initState();
-    var provider = Provider.of<MessageProvider>(context, listen: false);
-    provider.loadMessages(widget.chat.id).then((value) => provider.reloadMessages(widget.chat.id));
+    Provider.of<MessageProvider>(context, listen: false).reloadMessages(widget.chat.id);
+    // provider.loadMessages(widget.chat.id).then((value) => provider.reloadMessages(widget.chat.id));
   }
 
   @override

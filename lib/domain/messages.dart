@@ -35,6 +35,7 @@ class MessageProvider with ChangeNotifier {
 
   void clearMessages() {
     _messages = [];
+    notifyListeners();
   }
 
   void addMessage(Message newMessage) {

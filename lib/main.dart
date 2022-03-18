@@ -1,11 +1,13 @@
+import 'dart:convert';
+
 import 'package:chat/domain/chat.dart';
 import 'package:chat/domain/chats.dart';
 import 'package:chat/domain/messages.dart';
-import 'package:chat/pages/chat_page.dart';
 import 'package:chat/widgets/chat_listtile.dart';
 import 'package:chat/widgets/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(
@@ -43,13 +45,14 @@ class FlutterChat extends StatelessWidget {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const CircularProgressIndicator();
                 }
-                if (snapshot.hasError) return const Text("Could not load chats");
+                if (snapshot.hasError)
+                  return const Text("Could not load chats");
 
                 var response = snapshot.data as List<Chat>;
                 return Expanded(
                   child: RefreshIndicator(
                     onRefresh: () {
-                      return chats;
+                      return provider.loadChats();
                     },
                     child: ListView.builder(
                       itemBuilder: (context, index) {
@@ -77,9 +80,18 @@ class FlutterChat extends StatelessWidget {
                   children: <Widget>[
                     Container(
                       padding: const EdgeInsets.only(right: 10),
-                      child: const Icon(
-                        Icons.add,
-                        color: accentGrey,
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.add,
+                          color: accentGrey,
+                        ),
+                        onPressed: () {
+                          http.post(Uri.parse('$baseURL/chats/.json'),
+                              body: jsonEncode({
+                                "title": "New Chat",
+                                "picture": "https://picsum.photos/200/300",
+                              }));
+                        },
                       ),
                     ),
                   ],
