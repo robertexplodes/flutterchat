@@ -28,7 +28,8 @@ class FlutterChat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var chats = Provider.of<ChatProvider>(context).loadChats();
+    var provider = Provider.of<ChatProvider>(context);
+    var chats = provider.loadChats();
     return MaterialApp(
       title: 'Flutter Chat',
       home: Scaffold(
@@ -46,11 +47,16 @@ class FlutterChat extends StatelessWidget {
 
                 var response = snapshot.data as List<Chat>;
                 return Expanded(
-                  child: ListView.builder(
-                    itemBuilder: (context, index) {
-                      return ChatListTile(chat: response[index]);
+                  child: RefreshIndicator(
+                    onRefresh: () {
+                      return chats;
                     },
-                    itemCount: response.length,
+                    child: ListView.builder(
+                      itemBuilder: (context, index) {
+                        return ChatListTile(chat: response[index]);
+                      },
+                      itemCount: response.length,
+                    ),
                   ),
                 );
               },

@@ -14,11 +14,11 @@ class MessageProvider with ChangeNotifier {
     _messages = [];
     var response =
         await http.get(Uri.parse('$baseURL/chats/$chatId/messages.json'));
+    if (response.body == 'null') return [];
     var data = jsonDecode(response.body) as Map<String, dynamic>;
-    var messages =  data.entries.map((e) => Message(e.key, e.value["content"], e.value["time"])).toList();
-    // _messages = messages;
-    // _messages.sort((a, b) => a.time.compareTo(b.time));
-    // notifyListeners();
+    var messages = data.entries
+        .map((e) => Message(e.key, e.value["content"], e.value["time"]))
+        .toList();
     messages.sort((a, b) => a.time.compareTo(b.time));
     return messages;
   }
@@ -31,6 +31,10 @@ class MessageProvider with ChangeNotifier {
       }
     }
     notifyListeners();
+  }
+
+  void clearMessages() {
+    _messages = [];
   }
 
   void addMessage(Message newMessage) {

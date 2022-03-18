@@ -15,7 +15,7 @@ import '../domain/chat.dart';
 class ChatPage extends StatefulWidget {
   final Chat chat;
 
-  ChatPage({Key? key, required this.chat}) : super(key: key);
+  const ChatPage({Key? key, required this.chat}) : super(key: key);
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -27,17 +27,24 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     super.initState();
-    Provider.of<MessageProvider>(context, listen: false)
-        .loadMessages(widget.chat.id);
+    var provider = Provider.of<MessageProvider>(context, listen: false);
+    provider.loadMessages(widget.chat.id).then((value) => provider.reloadMessages(widget.chat.id));
   }
 
   @override
   Widget build(BuildContext context) {
     var provider = Provider.of<MessageProvider>(context);
-    Timer(Duration(seconds: 1), () => provider.reloadMessages(widget.chat.id));
+    Timer(const Duration(seconds: 1), () => provider.reloadMessages(widget.chat.id));
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.chat.name),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Provider.of<MessageProvider>(context, listen: false).clearMessages();
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -71,13 +78,13 @@ class _ChatPageState extends State<ChatPage> {
               //     );
               //   },
               // ),
-              child: ListView.builder(
-                itemBuilder: (context, index) {
-                  return MessageWidget(message: provider.messages[index]);
-                },
-                itemCount:
-                    Provider.of<MessageProvider>(context).messages.length,
-              ),
+                child: ListView.builder(
+                  itemBuilder: (context, index) {
+                    return MessageWidget(message: provider.messages[index]);
+                  },
+                  itemCount:
+                      Provider.of<MessageProvider>(context).messages.length,
+                ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
