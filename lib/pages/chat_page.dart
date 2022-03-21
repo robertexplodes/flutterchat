@@ -80,6 +80,7 @@ class _ChatPageState extends State<ChatPage> {
           image: DecorationImage(
             image: Image.asset("assets/background.png").image,
             fit: BoxFit.cover,
+            alignment: Alignment.topCenter,
           ),
         ),
         child: Column(

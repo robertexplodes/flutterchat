@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:chat/domain/chat.dart';
 import 'package:chat/domain/chats.dart';
 import 'package:chat/domain/messages.dart';
 import 'package:chat/widgets/chat_listtile.dart';
@@ -38,85 +37,88 @@ class FlutterChat extends StatelessWidget {
       title: 'Flutter Chat',
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Flutter Chat'),
+          title: Text('Chads'),
+          backgroundColor: darkGrey,
         ),
-        body: Column(
-          children: [
-            FutureBuilder(
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
-                }
-                if (snapshot.hasError)
-                  return const Text("Could not load chats");
+        body: Container(
+          color: whatsappGrey,
+          child: Column(
+            children: [
+              FutureBuilder(
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (snapshot.hasError) return const Text("Could not load chats");
 
-                // var response = snapshot.data as List<Chat>;
-                return Expanded(
-                  child: RefreshIndicator(
-                    onRefresh: () {
-                      return provider.reloadChats();
-                    },
-                    child: ListView.builder(
-                      itemBuilder: (context, index) {
-                        return ChatListTile(chat: provider.chats[index]);
+                  // var response = snapshot.data as List<Chat>;
+                  return Expanded(
+                    child: RefreshIndicator(
+                      onRefresh: () {
+                        return provider.reloadChats();
                       },
-                      itemCount: provider.chats.length,
-                    ),
-                  ),
-                );
-              },
-              future: chats,
-            ),
-            TextField(
-              cursorColor: Colors.white,
-              style: const TextStyle(
-                color: Color(0xffece5dd),
-              ),
-              controller: newChatController,
-              decoration: InputDecoration(
-                suffixIcon: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  // added line
-                  mainAxisSize: MainAxisSize.min,
-                  // added line
-                  children: <Widget>[
-                    Container(
-                      padding: const EdgeInsets.only(right: 10),
-                      child: IconButton(
-                        icon: const Icon(
-                          Icons.add,
-                          color: accentGrey,
-                        ),
-                        onPressed: () {
-                          handleNewChat();
+                      child: ListView.builder(
+                        itemBuilder: (context, index) {
+                          return ChatListTile(chat: provider.chats[index]);
                         },
+                        itemCount: provider.chats.length,
                       ),
                     ),
-                  ],
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: const BorderSide(
-                    color: Colors.transparent,
-                  ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: const BorderSide(
-                    color: Colors.transparent,
-                  ),
-                ),
-                filled: true,
-                fillColor: darkGrey,
-                hintStyle: const TextStyle(
-                  color: accentGrey,
-                ),
-                hintText: 'Neuer Chat',
-                contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 20.0, vertical: 10.0),
+                  );
+                },
+                future: chats,
               ),
-            )
-          ],
+              TextField(
+                cursorColor: Colors.white,
+                style: const TextStyle(
+                  color: Color(0xffece5dd),
+                ),
+                controller: newChatController,
+                decoration: InputDecoration(
+                  suffixIcon: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    // added line
+                    mainAxisSize: MainAxisSize.min,
+                    // added line
+                    children: <Widget>[
+                      Container(
+                        padding: const EdgeInsets.only(right: 10),
+                        child: IconButton(
+                          icon: const Icon(
+                            Icons.add,
+                            color: accentGrey,
+                          ),
+                          onPressed: () {
+                            handleNewChat();
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: const BorderSide(
+                      color: Colors.transparent,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: const BorderSide(
+                      color: Colors.transparent,
+                    ),
+                  ),
+                  filled: true,
+                  fillColor: darkGrey,
+                  hintStyle: const TextStyle(
+                    color: accentGrey,
+                  ),
+                  hintText: 'Neuer Chat',
+                  contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20.0, vertical: 10.0),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -128,7 +130,7 @@ class FlutterChat extends StatelessWidget {
     http.post(Uri.parse('$baseURL/chats/.json'),
         body: jsonEncode({
           "title": text,
-          "picture": "https://picsum.photos/200/300",
+          "picture": "https://i.pinimg.com/474x/3f/de/86/3fde8620893d9a399a8f9214c76cdc9a.jpg",
         }));
   }
 }
