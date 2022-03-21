@@ -46,7 +46,7 @@ class ChatListTile extends StatelessWidget {
               ),
             ),
             const Spacer(),
-            Container(
+            chat.messageCount > 0 ? Container(
               margin: const EdgeInsets.only(right: 8),
               child: CircleAvatar(
                 backgroundColor: primaryGreen,
@@ -55,7 +55,7 @@ class ChatListTile extends StatelessWidget {
                   style: const TextStyle(color: accentGrey),
                 ),
               ),
-            )
+            ) : Container(),
           ],
         ),
       ),

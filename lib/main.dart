@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:chat/domain/chat_search_service.dart';
 import 'package:chat/domain/chats.dart';
 import 'package:chat/domain/messages.dart';
 import 'package:chat/widgets/chat_listtile.dart';
@@ -39,6 +40,18 @@ class FlutterChat extends StatelessWidget {
         appBar: AppBar(
           title: Text('Chads'),
           backgroundColor: darkGrey,
+          actions: [
+            Builder(
+              builder: (BuildContext context) {
+                return IconButton(
+                  onPressed: () {
+                    showSearch(context: context, delegate: ChatSearchService());
+                  },
+                  icon: Icon(Icons.search),
+                );
+              },
+            ),
+          ],
         ),
         body: Container(
           color: whatsappGrey,
@@ -49,7 +62,8 @@ class FlutterChat extends StatelessWidget {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return CircularProgressIndicator();
                   }
-                  if (snapshot.hasError) return const Text("Could not load chats");
+                  if (snapshot.hasError)
+                    return const Text("Could not load chats");
 
                   // var response = snapshot.data as List<Chat>;
                   return Expanded(
@@ -130,7 +144,8 @@ class FlutterChat extends StatelessWidget {
     http.post(Uri.parse('$baseURL/chats/.json'),
         body: jsonEncode({
           "title": text,
-          "picture": "https://i.pinimg.com/474x/3f/de/86/3fde8620893d9a399a8f9214c76cdc9a.jpg",
+          "picture":
+              "https://i.pinimg.com/474x/3f/de/86/3fde8620893d9a399a8f9214c76cdc9a.jpg",
         }));
   }
 }
