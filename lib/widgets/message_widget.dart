@@ -1,6 +1,7 @@
 import 'package:chat/domain/message.dart';
 import 'package:chat/widgets/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class MessageWidget extends StatelessWidget {
   final Message message;
@@ -53,7 +54,7 @@ class MessageWidget extends StatelessWidget {
               Container(
                 alignment: Alignment.centerRight,
                 child: Text(
-                  '${parsedDateTime.hour}:${parsedDateTime.minute}',
+                  DateFormat("hh:mm").format(parsedDateTime),
                   style: TextStyle(color: accentGrey, fontSize: 11),
                 ),
               ),

@@ -11,7 +11,7 @@ class MessageProvider with ChangeNotifier {
   List<Message> get messages => _messages;
 
   Future<List<Message>> loadMessages(String chatId) async {
-    _messages = [];
+    // _messages = [];
     var response =
         await http.get(Uri.parse('$baseURL/chats/$chatId/messages.json'));
     if (response.body == 'null') return [];
@@ -24,13 +24,14 @@ class MessageProvider with ChangeNotifier {
   }
 
   void reloadMessages(String chatId) async {
+    var oldLength = _messages.length;
     var newMessages = await loadMessages(chatId);
     for (var message in newMessages) {
       if (!_messages.contains(message)) {
         _messages.add(message);
       }
     }
-    notifyListeners();
+    if(oldLength != _messages.length) notifyListeners();
   }
 
   void clearMessages() {

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:chat/domain/chats.dart';
 import 'package:chat/domain/message.dart';
 import 'package:chat/domain/messages.dart';
 import 'package:chat/widgets/constants.dart';
@@ -24,24 +25,44 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   var controller = TextEditingController();
 
+  ScrollController listScrollController = ScrollController();
+
+  late var timer =  Timer.periodic(
+      const Duration(seconds: 3),
+          (timer) => Provider.of<MessageProvider>(context, listen: false)
+          .reloadMessages(widget.chat.id));
+
   @override
   void initState() {
     super.initState();
-    Provider.of<MessageProvider>(context, listen: false).reloadMessages(widget.chat.id);
-    // provider.loadMessages(widget.chat.id).then((value) => provider.reloadMessages(widget.chat.id));
+    Provider.of<MessageProvider>(context, listen: false)
+        .reloadMessages(widget.chat.id);
   }
 
   @override
   Widget build(BuildContext context) {
     var provider = Provider.of<MessageProvider>(context);
-    Timer(const Duration(seconds: 1), () => provider.reloadMessages(widget.chat.id));
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.chat.name),
+        backgroundColor: const Color.fromRGBO(32, 44, 51, 1),
+        titleSpacing: 0,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            CircleAvatar(
+              backgroundImage: Image.network(widget.chat.imageURL).image,
+            ),
+            const SizedBox(width: 10),
+            Text(widget.chat.name),
+          ],
+        ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Provider.of<MessageProvider>(context, listen: false).clearMessages();
+            Provider.of<MessageProvider>(context, listen: false)
+                .clearMessages();
+            timer.cancel();
             Navigator.pop(context);
           },
         ),
@@ -56,35 +77,13 @@ class _ChatPageState extends State<ChatPage> {
         child: Column(
           children: [
             Expanded(
-              // child: FutureBuilder(
-              // future: provider.loadMessages(widget.chat.id),
-              //   builder: (BuildContext context, AsyncSnapshot<List<Message>> snapshot) {
-              //     // if(snapshot.connectionState == ConnectionState.waiting) {
-              //     //   return Center(
-              //     //     child: CircularProgressIndicator(),
-              //     //   );
-              //     // }
-              //     if(snapshot.hasError) {
-              //       return Center(
-              //         child: Text("Error: ${snapshot.error}", style: TextStyle(color: Colors.red)),
-              //       );
-              //     }
-              //
-              //     return ListView.builder(
-              //       itemBuilder: (context, index) {
-              //         return MessageWidget(message: provider.messages[index]);
-              //       },
-              //       itemCount: provider.messages.length,
-              //     );
-              //   },
-              // ),
-                child: ListView.builder(
-                  itemBuilder: (context, index) {
-                    return MessageWidget(message: provider.messages[index]);
-                  },
-                  itemCount:
-                      Provider.of<MessageProvider>(context).messages.length,
-                ),
+              child: ListView.builder(
+                itemBuilder: (context, index) {
+                  return MessageWidget(message: provider.messages[index]);
+                },
+                itemCount: provider.messages.length,
+
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),

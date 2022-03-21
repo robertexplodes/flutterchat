@@ -2,6 +2,7 @@ import 'package:chat/domain/chat.dart';
 import 'package:chat/pages/chat_page.dart';
 import 'package:chat/widgets/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class ChatListTile extends StatelessWidget {
   final Chat chat;
@@ -24,16 +25,28 @@ class ChatListTile extends StatelessWidget {
           children: [
             GestureDetector(
               onTap: () {
-                showDialog(context: context,barrierDismissible: true, builder: (context) {
-                  return Container(
-                    width:500,
-                    height: 10,
-                    child: Image.network(chat.imageURL, fit: BoxFit.cover,),
-                  );
-                }, );
+                showDialog(
+                  context: context,
+                  barrierDismissible: true,
+                  builder: (context) {
+                    return Container(
+                      width: 500,
+                      height: 10,
+                      child: Image.network(
+                        chat.imageURL,
+                        fit: BoxFit.cover,
+                      ),
+                    );
+                  },
+                );
               },
               child: CircleAvatar(
-                backgroundImage: Image.network(chat.imageURL).image,
+                backgroundImage: Image.network(
+                  chat.imageURL,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Image.asset("assets/default_user.png");
+                  },
+                ).image,
               ),
             ),
             Container(
