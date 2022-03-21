@@ -11,12 +11,11 @@ class ChatProvider with ChangeNotifier {
 
   List<Chat> _chats = [];
 
-  List<Chat> get chats => [..._chats];
+  List<Chat> get chats => _chats;
 
   Future<List<Chat>> loadChats() async {
     var response = await http.get(Uri.parse('$baseURL/chats.json'));
     var data = jsonDecode(response.body) as Map<String, dynamic>;
-
     return data.entries.map((e) {
       var value = e.value as Map<String, dynamic>;
 
@@ -32,11 +31,8 @@ class ChatProvider with ChangeNotifier {
   Future<void> reloadChats() async {
     var oldLength = _chats.length;
     var newChats = await loadChats();
-    for (var chat in newChats) {
-      if (!_chats.contains(chat)) {
-        _chats.add(chat);
-      }
-    }
+    _chats.addAll(newChats);
+    _chats = _chats.toSet().toList();
     if(oldLength != _chats.length) notifyListeners();
   }
 }

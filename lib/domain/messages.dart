@@ -23,20 +23,16 @@ class MessageProvider with ChangeNotifier {
     return messages;
   }
 
-  void reloadMessages(String chatId) async {
+  Future<void> reloadMessages(String chatId) async {
     var oldLength = _messages.length;
     var newMessages = await loadMessages(chatId);
-    for (var message in newMessages) {
-      if (!_messages.contains(message)) {
-        _messages.add(message);
-      }
-    }
+    _messages.addAll(newMessages);
+    _messages = _messages.toSet().toList();
     if(oldLength != _messages.length) notifyListeners();
   }
 
   void clearMessages() {
     _messages = [];
-    notifyListeners();
   }
 
   void addMessage(Message newMessage) {

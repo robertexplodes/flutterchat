@@ -33,7 +33,7 @@ class FlutterChat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var provider = Provider.of<ChatProvider>(context);
-    var chats = provider.loadChats();
+    var chats = provider.reloadChats();
     return MaterialApp(
       title: 'Flutter Chat',
       home: Scaffold(
@@ -45,9 +45,10 @@ class FlutterChat extends StatelessWidget {
             FutureBuilder(
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const CircularProgressIndicator();
+                  return CircularProgressIndicator();
                 }
-                if (snapshot.hasError) return const Text("Could not load chats");
+                if (snapshot.hasError)
+                  return const Text("Could not load chats");
 
                 // var response = snapshot.data as List<Chat>;
                 return Expanded(

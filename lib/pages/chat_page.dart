@@ -25,23 +25,31 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   var controller = TextEditingController();
 
-  ScrollController listScrollController = ScrollController();
+  bool _shouldRefresh = true;
 
-  late var timer =  Timer.periodic(
-      const Duration(seconds: 3),
-          (timer) => Provider.of<MessageProvider>(context, listen: false)
-          .reloadMessages(widget.chat.id));
+  ScrollController listScrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     Provider.of<MessageProvider>(context, listen: false)
-        .reloadMessages(widget.chat.id);
+      .reloadMessages(widget.chat.id);
   }
 
   @override
   Widget build(BuildContext context) {
     var provider = Provider.of<MessageProvider>(context);
+
+    Timer.periodic(
+        const Duration(seconds: 3),
+            (timer) {
+          if(!_shouldRefresh) {
+            timer.cancel();
+            return;
+          }
+          Provider.of<MessageProvider>(context, listen: false)
+              .reloadMessages(widget.chat.id);
+        });
 
     return Scaffold(
       appBar: AppBar(
@@ -60,9 +68,9 @@ class _ChatPageState extends State<ChatPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
+            _shouldRefresh = false;
             Provider.of<MessageProvider>(context, listen: false)
                 .clearMessages();
-            timer.cancel();
             Navigator.pop(context);
           },
         ),
@@ -82,7 +90,6 @@ class _ChatPageState extends State<ChatPage> {
                   return MessageWidget(message: provider.messages[index]);
                 },
                 itemCount: provider.messages.length,
-
               ),
             ),
             Padding(
