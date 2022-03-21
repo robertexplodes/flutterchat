@@ -20,13 +20,15 @@ void main() {
           create: (context) => MessageProvider(),
         )
       ],
-      child: const FlutterChat(),
+      child: FlutterChat(),
     ),
   );
 }
 
 class FlutterChat extends StatelessWidget {
-  const FlutterChat({Key? key}) : super(key: key);
+  FlutterChat({Key? key}) : super(key: key);
+
+  var newChatController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -45,32 +47,31 @@ class FlutterChat extends StatelessWidget {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const CircularProgressIndicator();
                 }
-                if (snapshot.hasError)
-                  return const Text("Could not load chats");
+                if (snapshot.hasError) return const Text("Could not load chats");
 
-                var response = snapshot.data as List<Chat>;
+                // var response = snapshot.data as List<Chat>;
                 return Expanded(
                   child: RefreshIndicator(
                     onRefresh: () {
-                      return provider.loadChats();
+                      return provider.reloadChats();
                     },
                     child: ListView.builder(
                       itemBuilder: (context, index) {
-                        return ChatListTile(chat: response[index]);
+                        return ChatListTile(chat: provider.chats[index]);
                       },
-                      itemCount: response.length,
+                      itemCount: provider.chats.length,
                     ),
                   ),
                 );
               },
               future: chats,
             ),
-            const Spacer(),
             TextField(
               cursorColor: Colors.white,
               style: const TextStyle(
                 color: Color(0xffece5dd),
               ),
+              controller: newChatController,
               decoration: InputDecoration(
                 suffixIcon: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -86,11 +87,7 @@ class FlutterChat extends StatelessWidget {
                           color: accentGrey,
                         ),
                         onPressed: () {
-                          http.post(Uri.parse('$baseURL/chats/.json'),
-                              body: jsonEncode({
-                                "title": "New Chat",
-                                "picture": "https://picsum.photos/200/300",
-                              }));
+                          handleNewChat();
                         },
                       ),
                     ),
@@ -122,5 +119,15 @@ class FlutterChat extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void handleNewChat() {
+    var text = newChatController.text;
+    newChatController.clear();
+    http.post(Uri.parse('$baseURL/chats/.json'),
+        body: jsonEncode({
+          "title": text,
+          "picture": "https://picsum.photos/200/300",
+        }));
   }
 }

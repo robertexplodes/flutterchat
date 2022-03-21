@@ -20,25 +20,12 @@ class ChatListTile extends StatelessWidget {
       child: Container(
         height: 70,
         color: darkGrey,
-        padding: EdgeInsets.only(left: 10),
+        padding: const EdgeInsets.only(left: 10),
         child: Row(
           children: [
             GestureDetector(
               onTap: () {
-                showDialog(
-                  context: context,
-                  barrierDismissible: true,
-                  builder: (context) {
-                    return Container(
-                      width: 500,
-                      height: 10,
-                      child: Image.network(
-                        chat.imageURL,
-                        fit: BoxFit.cover,
-                      ),
-                    );
-                  },
-                );
+                showProfilepicture(context);
               },
               child: CircleAvatar(
                 backgroundImage: Image.network(
@@ -50,7 +37,7 @@ class ChatListTile extends StatelessWidget {
               ),
             ),
             Container(
-              margin: EdgeInsets.only(left: 10),
+              margin: const EdgeInsets.only(left: 10),
               child: Text(
                 chat.name,
                 style: const TextStyle(
@@ -72,6 +59,43 @@ class ChatListTile extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void showProfilepicture(BuildContext context) {
+    var controller = TextEditingController(text: chat.imageURL);
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return Container(
+          width: double.infinity,
+          height: double.infinity,
+          color: Colors.white,
+          child: Column(
+            children: [
+              Expanded(
+                child: Image.network(
+                  chat.imageURL,
+                  height: 200,
+                ),
+              ),
+              Expanded(
+                child: Material(
+                  child: TextField(
+                    controller: controller,
+                    onSubmitted: (value) {
+                      chat.imageURL = controller.text;
+                      controller.clear();
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ),
+              )
+            ],
+          ),
+        );
+      },
     );
   }
 }
