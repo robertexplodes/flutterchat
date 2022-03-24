@@ -2,8 +2,10 @@ import 'dart:convert';
 
 import 'package:chat/domain/chat_search_service.dart';
 import 'package:chat/domain/chats.dart';
+import 'package:chat/domain/login_provider.dart';
 import 'package:chat/domain/messages.dart';
 import 'package:chat/pages/chats_page.dart';
+import 'package:chat/pages/login_page.dart';
 import 'package:chat/widgets/chat_listtile.dart';
 import 'package:chat/widgets/constants.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +21,9 @@ void main() {
         ),
         ChangeNotifierProvider(
           create: (context) => MessageProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => LoginProvider(),
         )
       ],
       child: FlutterChat(),
@@ -31,7 +36,6 @@ class FlutterChat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp(
       title: 'Flutter Chat',
       theme: ThemeData(
@@ -40,8 +44,11 @@ class FlutterChat extends StatelessWidget {
           foregroundColor: accentGrey,
         ),
       ),
-      home: ChatsPage(),
+      routes: {
+        '/': (context) => LoginPage(),
+        ChatsPage.route: (context) => const ChatsPage(),
+      },
+      initialRoute: '/',
     );
   }
-
 }

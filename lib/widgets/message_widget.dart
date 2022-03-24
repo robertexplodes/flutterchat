@@ -29,17 +29,17 @@ class MessageWidget extends StatelessWidget {
           alignment: Alignment.centerLeft,
           child: Column(
             children: [
-              // SizedBox(
-              //   child: Text(
-              //     message.user,
-              //     style: const TextStyle(
-              //       fontSize: 15,
-              //       fontWeight: FontWeight.bold,
-              //       color: Colors.pinkAccent,
-              //     ),
-              //   ),
-              //   width: MediaQuery.of(context).size.width,
-              // ),
+              SizedBox(
+                child: Text(
+                  message.senderEmail,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.pinkAccent,
+                  ),
+                ),
+                width: MediaQuery.of(context).size.width,
+              ),
               Container(
                 width: MediaQuery.of(context).size.width,
                 padding: EdgeInsets.fromLTRB(5, 5, 0, 5),

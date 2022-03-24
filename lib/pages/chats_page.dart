@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:chat/domain/chat_search_service.dart';
 import 'package:chat/domain/chats.dart';
+import 'package:chat/domain/login_provider.dart';
 import 'package:chat/widgets/chat_listtile.dart';
 import 'package:chat/widgets/constants.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,8 @@ import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
 class ChatsPage extends StatefulWidget {
+  static const String route = '/chats';
+
   const ChatsPage({Key? key}) : super(key: key);
 
   @override
@@ -16,7 +19,6 @@ class ChatsPage extends StatefulWidget {
 }
 
 class _ChatsPageState extends State<ChatsPage> {
-
   var newChatController = TextEditingController();
 
   @override
@@ -40,6 +42,13 @@ class _ChatsPageState extends State<ChatsPage> {
                 icon: Icon(Icons.search),
               );
             },
+          ),
+          IconButton(
+            onPressed: () {
+              Provider.of<LoginProvider>(context, listen: false).logout();
+              Navigator.of(context).popAndPushNamed('/');
+            },
+            icon: Icon(Icons.logout),
           ),
         ],
       ),
@@ -134,7 +143,7 @@ class _ChatsPageState extends State<ChatsPage> {
         body: jsonEncode({
           "title": text,
           "picture":
-          "https://i.pinimg.com/474x/3f/de/86/3fde8620893d9a399a8f9214c76cdc9a.jpg",
+              "https://i.pinimg.com/474x/3f/de/86/3fde8620893d9a399a8f9214c76cdc9a.jpg",
         }));
   }
 }

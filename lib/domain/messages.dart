@@ -17,7 +17,7 @@ class MessageProvider with ChangeNotifier {
     if (response.body == 'null') return [];
     var data = jsonDecode(response.body) as Map<String, dynamic>;
     var messages = data.entries
-        .map((e) => Message(e.key, e.value["content"], e.value["time"]))
+        .map((e) => Message(e.key, e.value["content"], e.value["time"], e.value["sender"]))
         .toList();
     messages.sort((a, b) => a.time.compareTo(b.time));
     return messages;

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:chat/domain/chats.dart';
+import 'package:chat/domain/login_provider.dart';
 import 'package:chat/domain/message.dart';
 import 'package:chat/domain/messages.dart';
 import 'package:chat/widgets/constants.dart';
@@ -130,15 +131,17 @@ class _ChatPageState extends State<ChatPage> {
 
   void sendMessage(String content, BuildContext context) {
     var timeStamp = DateTime.now().millisecondsSinceEpoch;
+    var user = Provider.of<LoginProvider>(context, listen: false).user;
     http
         .post(
       Uri.parse('$baseURL/chats/${widget.chat.id}/messages.json'),
-      body: jsonEncode({"content": content, "time": timeStamp}),
+      body: jsonEncode({"content": content, "time": timeStamp, "sender": user!.email}),
     )
         .then((value) {
       var response = jsonDecode(value.body);
+      var user = Provider.of<LoginProvider>(context).user;
       Provider.of<MessageProvider>(context, listen: false)
-          .addMessage(Message(response["name"], content, timeStamp));
+          .addMessage(Message(response["name"], content, timeStamp, user?.email));
     }).catchError((error) {});
   }
 }
