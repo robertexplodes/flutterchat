@@ -1,5 +1,6 @@
 import 'package:chat/domain/login_provider.dart';
 import 'package:chat/pages/chats_page.dart';
+import 'package:chat/widgets/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -17,16 +18,39 @@ class LoginPage extends StatelessWidget {
         appBar: AppBar(
           title: const Text('Login'),
         ),
-        body: Padding(
+        body: Container(
+          color: whatsappGrey,
           padding: const EdgeInsets.all(8.0),
           child: Form(
             key: _formKey,
             child: Column(
               children: [
                 TextFormField(
+                  style: TextStyle(
+                    color: accentGrey,
+                  ),
                   controller: _emailController,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
+                  decoration: InputDecoration(
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      borderSide: const BorderSide(
+                        color: Colors.transparent,
+                      ),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      borderSide: const BorderSide(
+                        color: Colors.transparent,
+                      ),
+                    ),
+                    filled: true,
+                    fillColor: darkGrey,
+                    hintStyle: const TextStyle(
+                      color: accentGrey,
+                    ),
+                    hintText: 'E-Mail',
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20.0, vertical: 10.0),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -38,23 +62,63 @@ class LoginPage extends StatelessWidget {
                     return null;
                   },
                 ),
-                TextFormField(
-                  controller: _passwordController,
-                  decoration: const InputDecoration(
-                    labelText: 'Password',
+                Container(
+                  margin: const EdgeInsets.only(top: 20.0),
+                  child: TextFormField(
+                    style: TextStyle(
+                      color: accentGrey,
+                    ),
+                    controller: _passwordController,
+                    decoration: InputDecoration(
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: const BorderSide(
+                          color: Colors.transparent,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        borderSide: const BorderSide(
+                          color: Colors.transparent,
+                        ),
+                      ),
+                      filled: true,
+                      fillColor: darkGrey,
+                      hintStyle: const TextStyle(
+                        color: accentGrey,
+                      ),
+                      hintText: 'Passwort',
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20.0, vertical: 10.0),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter a password';
+                      }
+                      return null;
+                    },
+                    obscureText: true,
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a password';
-                    }
-                    return null;
-                  },
                 ),
-                TextButton(
-                  child: const Text('Login'),
-                  onPressed: () {
-                    handleLogin(context);
-                  },
+                Container(
+                  width: 200,
+                  margin: const EdgeInsets.only(top: 20.0),
+                  child: TextButton(
+                    child: const Text(
+                      'Login',
+                      style: TextStyle(
+                        color: accentGrey,
+                        fontSize: 16,
+                      ),
+                    ),
+                    onPressed: () {
+                      handleLogin(context);
+                    },
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    color: primaryGreen,
+                  ),
                 ),
               ],
             ),
@@ -70,9 +134,8 @@ class LoginPage extends StatelessWidget {
     Provider.of<LoginProvider>(context, listen: false)
         .login(_emailController.text, _passwordController.text)
         .then((user) {
-          Navigator.of(context).popAndPushNamed(ChatsPage.route);
-    })
-        .catchError((error) {
+      Navigator.of(context).popAndPushNamed(ChatsPage.route);
+    }).catchError((error) {
       showModalBottomSheet(
         context: context,
         builder: (BuildContext context) {
