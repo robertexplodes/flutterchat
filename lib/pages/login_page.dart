@@ -26,6 +26,7 @@ class LoginPage extends StatelessWidget {
           child: Column(
             children: [
               TextFormField(
+                keyboardType: TextInputType.emailAddress,
                 style: TextStyle(
                   color: accentGrey,
                 ),
