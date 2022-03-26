@@ -45,6 +45,7 @@ class MessageWidget extends StatelessWidget {
                 padding: EdgeInsets.fromLTRB(5, 5, 0, 5),
                 child: Text(
                   message.content,
+                  softWrap: true,
                   style: TextStyle(
                     color: accentGrey,
                     fontSize: 15,
