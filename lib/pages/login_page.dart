@@ -1,4 +1,6 @@
-import 'package:chat/domain/login_provider.dart';
+import 'dart:async';
+
+import 'package:chat/domain/auth_provider.dart';
 import 'package:chat/pages/chats_page.dart';
 import 'package:chat/widgets/constants.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +29,7 @@ class LoginPage extends StatelessWidget {
             children: [
               TextFormField(
                 keyboardType: TextInputType.emailAddress,
-                style: TextStyle(
+                style: const TextStyle(
                   color: accentGrey,
                 ),
                 controller: _emailController,
@@ -66,7 +68,7 @@ class LoginPage extends StatelessWidget {
               Container(
                 margin: const EdgeInsets.only(top: 20.0),
                 child: TextFormField(
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: accentGrey,
                   ),
                   controller: _passwordController,
@@ -148,46 +150,116 @@ class LoginPage extends StatelessWidget {
     );
   }
 
+  // Future<void> login(String email, String password, BuildContext context) async {
+  //   await  Provider.of<AuthProvider>(context, listen: false)
+  //       .login(_emailController.text, _passwordController.text);
+  //   Navigator.of(context).popAndPushNamed(ChatsPage.route);
+  // }
+
   void handleLogin(BuildContext context) {
     if (!_formKey.currentState!.validate()) {
       return;
     }
+    // Provider.of<AuthProvider>(context, listen: false)
+    //     .login(_emailController.text, _passwordController.text);
+    var email = _emailController.text;
+    var password = _passwordController.text;
 
-    Provider.of<LoginProvider>(context, listen: false)
-        .login(_emailController.text, _passwordController.text)
-        .then((user) {
-      Navigator.of(context).popAndPushNamed(ChatsPage.route);
-    }).catchError((error) {
-      showModalBottomSheet(
-        context: context,
-        builder: (BuildContext context) {
-          return Material(
-            child: Center(
-              child: Container(
-                height: 200,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.error, color: Colors.red),
-                    Text(
-                      'Sie konnten nicht eingeloggt werden',
-                      style: TextStyle(
-                        color: Colors.redAccent,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      );
-    });
+    showAuthProcess(
+      email: email,
+      password: password,
+      onError: "Sie konntent nicht eingeloggt werden.",
+      onSuccess: "Login erfolgreich",
+      context: context,
+      authProcess: Provider.of<AuthProvider>(context, listen: false).login,
+    );
     _passwordController.clear();
     _emailController.clear();
   }
 
-  void handleSignup(BuildContext context) {}
+  void showAuthProcess(
+      {required String email,
+      required String password,
+      required String onError,
+      required String onSuccess,
+      required BuildContext context,
+      required Future<dynamic> Function(String email, String password)
+          authProcess}) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Material(
+          child: Center(
+            child: SizedBox(
+              height: 200,
+              child: FutureBuilder(
+                future: authProcess(email, password),
+                builder:
+                    (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                  if (snapshot.hasError) {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.error, color: Colors.red),
+                        Text(
+                          onError,
+                          style: const TextStyle(
+                            color: Colors.redAccent,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                  Timer(const Duration(seconds: 2), () {
+                    Navigator.of(context).pop(); // modal bottom sheet
+                    Navigator.of(context).popAndPushNamed(ChatsPage.route);
+                  });
+                  return SizedBox(
+                    child: Center(
+                      child: Text(
+                        onSuccess,
+                        style: const TextStyle(
+                          color: Colors.green,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void handleSignup(BuildContext context) {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+
+    var email = _emailController.text;
+    var password = _passwordController.text;
+
+    showAuthProcess(
+      email: email,
+      password: password,
+      onError: "Account konnte nicht erstellt werden.",
+      onSuccess: "Account erfolgreich erstellt",
+      context: context,
+      authProcess: Provider.of<AuthProvider>(context, listen: false).signup,
+    );
+
+    _passwordController.clear();
+    _emailController.clear();
+  }
 }

@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:chat/domain/chat_search_service.dart';
 import 'package:chat/domain/chats.dart';
-import 'package:chat/domain/login_provider.dart';
+import 'package:chat/domain/auth_provider.dart';
 import 'package:chat/widgets/chat_listtile.dart';
 import 'package:chat/widgets/constants.dart';
 import 'package:flutter/material.dart';
@@ -45,7 +45,7 @@ class _ChatsPageState extends State<ChatsPage> {
           ),
           IconButton(
             onPressed: () {
-              Provider.of<LoginProvider>(context, listen: false).logout();
+              Provider.of<AuthProvider>(context, listen: false).logout();
               Navigator.of(context).popAndPushNamed('/');
             },
             icon: Icon(Icons.logout),

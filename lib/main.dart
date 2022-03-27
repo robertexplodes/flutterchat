@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:chat/domain/chat_search_service.dart';
 import 'package:chat/domain/chats.dart';
-import 'package:chat/domain/login_provider.dart';
+import 'package:chat/domain/auth_provider.dart';
 import 'package:chat/domain/messages.dart';
 import 'package:chat/pages/chats_page.dart';
 import 'package:chat/pages/login_page.dart';
@@ -23,7 +23,7 @@ void main() {
           create: (context) => MessageProvider(),
         ),
         ChangeNotifierProvider(
-          create: (context) => LoginProvider(),
+          create: (context) => AuthProvider(),
         )
       ],
       child: FlutterChat(),
