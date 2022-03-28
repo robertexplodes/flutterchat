@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:chat/domain/chat.dart';
 import 'package:chat/domain/chat_search_service.dart';
 import 'package:chat/domain/chats.dart';
+import 'package:chat/domain/auth_provider.dart';
 import 'package:chat/widgets/chat_listtile.dart';
 import 'package:chat/widgets/constants.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +11,8 @@ import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
 class ChatsPage extends StatefulWidget {
+  static const String route = '/chats';
+
   const ChatsPage({Key? key}) : super(key: key);
 
   @override
@@ -16,7 +20,6 @@ class ChatsPage extends StatefulWidget {
 }
 
 class _ChatsPageState extends State<ChatsPage> {
-
   var newChatController = TextEditingController();
 
   @override
@@ -25,7 +28,7 @@ class _ChatsPageState extends State<ChatsPage> {
     var chats = provider.reloadChats();
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chads'),
+        title: Text('Chats'),
         // backgroundColor: darkGrey,
         actions: [
           Builder(
@@ -41,6 +44,13 @@ class _ChatsPageState extends State<ChatsPage> {
               );
             },
           ),
+          IconButton(
+            onPressed: () {
+              Provider.of<AuthProvider>(context, listen: false).logout();
+              Navigator.of(context).popAndPushNamed('/');
+            },
+            icon: Icon(Icons.logout),
+          ),
         ],
       ),
       body: Container(
@@ -50,7 +60,11 @@ class _ChatsPageState extends State<ChatsPage> {
             FutureBuilder(
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
+                  return const Expanded(
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
                 }
                 if (snapshot.hasError)
                   return const Text("Could not load chats");
@@ -128,13 +142,16 @@ class _ChatsPageState extends State<ChatsPage> {
   }
 
   void handleNewChat() {
-    var text = newChatController.text;
+    var chatName = newChatController.text;
     newChatController.clear();
+    var defaultImage= "https://i.pinimg.com/474x/3f/de/86/3fde8620893d9a399a8f9214c76cdc9a.jpg";
     http.post(Uri.parse('$baseURL/chats/.json'),
         body: jsonEncode({
-          "title": text,
+          "title": chatName,
           "picture":
-          "https://i.pinimg.com/474x/3f/de/86/3fde8620893d9a399a8f9214c76cdc9a.jpg",
-        }));
+              defaultImage,
+        })).then((value) {
+      Provider.of<ChatProvider>(context, listen: false).reloadChats();
+    });
   }
 }

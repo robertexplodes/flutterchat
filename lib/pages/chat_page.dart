@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:chat/domain/chats.dart';
+import 'package:chat/domain/auth_provider.dart';
 import 'package:chat/domain/message.dart';
 import 'package:chat/domain/messages.dart';
 import 'package:chat/widgets/constants.dart';
@@ -33,23 +34,21 @@ class _ChatPageState extends State<ChatPage> {
   void initState() {
     super.initState();
     Provider.of<MessageProvider>(context, listen: false)
-      .reloadMessages(widget.chat.id);
+        .reloadMessages(widget.chat.id);
   }
 
   @override
   Widget build(BuildContext context) {
     var provider = Provider.of<MessageProvider>(context);
 
-    Timer.periodic(
-        const Duration(seconds: 3),
-            (timer) {
-          if(!_shouldRefresh) {
-            timer.cancel();
-            return;
-          }
-          Provider.of<MessageProvider>(context, listen: false)
-              .reloadMessages(widget.chat.id);
-        });
+    Timer.periodic(const Duration(seconds: 3), (timer) {
+      if (!_shouldRefresh) {
+        timer.cancel();
+        return;
+      }
+      Provider.of<MessageProvider>(context, listen: false)
+          .reloadMessages(widget.chat.id);
+    });
 
     return Scaffold(
       appBar: AppBar(
@@ -88,7 +87,12 @@ class _ChatPageState extends State<ChatPage> {
             Expanded(
               child: ListView.builder(
                 itemBuilder: (context, index) {
-                  return MessageWidget(message: provider.messages[index]);
+                  return MessageWidget(
+                    message: provider.messages[index],
+                    messageFromMe:
+                        Provider.of<AuthProvider>(context).user!.email ==
+                            provider.messages[index].senderEmail,
+                  );
                 },
                 itemCount: provider.messages.length,
               ),
@@ -130,15 +134,18 @@ class _ChatPageState extends State<ChatPage> {
 
   void sendMessage(String content, BuildContext context) {
     var timeStamp = DateTime.now().millisecondsSinceEpoch;
+    var user = Provider.of<AuthProvider>(context, listen: false).user;
     http
         .post(
       Uri.parse('$baseURL/chats/${widget.chat.id}/messages.json'),
-      body: jsonEncode({"content": content, "time": timeStamp}),
+      body: jsonEncode(
+          {"content": content, "time": timeStamp, "sender": user!.email}),
     )
         .then((value) {
-      var response = jsonDecode(value.body);
-      Provider.of<MessageProvider>(context, listen: false)
-          .addMessage(Message(response["name"], content, timeStamp));
-    }).catchError((error) {});
+      var response = jsonDecode(value.body) as Map<String, dynamic>;
+      var user = Provider.of<AuthProvider>(context, listen: false).user;
+      Provider.of<MessageProvider>(context, listen: false).addMessage(
+          Message(response["name"], content, timeStamp, user?.email));
+    });
   }
 }

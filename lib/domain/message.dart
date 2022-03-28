@@ -2,8 +2,10 @@ class Message {
   String id;
   String content;
   int time;
+  String senderEmail;
 
-  Message(this.id, this.content, this.time);
+  Message(this.id, this.content, this.time, String? sender)
+      : senderEmail = sender ?? "Anonymous";
 
   @override
   String toString() {

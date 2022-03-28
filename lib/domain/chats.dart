@@ -29,10 +29,26 @@ class ChatProvider with ChangeNotifier {
   }
 
   Future<void> reloadChats() async {
-    var oldLength = _chats.length;
+    bool notify = false;
     var newChats = await loadChats();
-    _chats.addAll(newChats);
+    for(var chat in newChats) {
+      if(!_chats.contains(chat)) {
+        _chats.add(chat);
+        notify = true;
+      } else {
+        var oldChat = _chats.indexWhere((c) => c.id == chat.id);
+        if(_chats[oldChat].messageCount != chat.messageCount) {
+          _chats[oldChat].messageCount = chat.messageCount;
+          notify = true;
+        }
+      }
+    }
     _chats = _chats.toSet().toList();
-    if(oldLength != _chats.length) notifyListeners();
+    if(notify) notifyListeners();
+  }
+
+  void addChat(Chat chat) {
+    _chats.add(chat);
+    notifyListeners();
   }
 }
