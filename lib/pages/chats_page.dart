@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:chat/domain/chat.dart';
 import 'package:chat/domain/chat_search_service.dart';
 import 'package:chat/domain/chats.dart';
 import 'package:chat/domain/auth_provider.dart';
@@ -27,7 +28,7 @@ class _ChatsPageState extends State<ChatsPage> {
     var chats = provider.reloadChats();
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chads'),
+        title: Text('Chats'),
         // backgroundColor: darkGrey,
         actions: [
           Builder(
@@ -141,13 +142,16 @@ class _ChatsPageState extends State<ChatsPage> {
   }
 
   void handleNewChat() {
-    var text = newChatController.text;
+    var chatName = newChatController.text;
     newChatController.clear();
+    var defaultImage= "https://i.pinimg.com/474x/3f/de/86/3fde8620893d9a399a8f9214c76cdc9a.jpg";
     http.post(Uri.parse('$baseURL/chats/.json'),
         body: jsonEncode({
-          "title": text,
+          "title": chatName,
           "picture":
-              "https://i.pinimg.com/474x/3f/de/86/3fde8620893d9a399a8f9214c76cdc9a.jpg",
-        }));
+              defaultImage,
+        })).then((value) {
+      Provider.of<ChatProvider>(context, listen: false).reloadChats();
+    });
   }
 }

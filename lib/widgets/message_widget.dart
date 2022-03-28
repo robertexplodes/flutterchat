@@ -5,41 +5,53 @@ import 'package:intl/intl.dart';
 
 class MessageWidget extends StatelessWidget {
   final Message message;
+  final bool messageFromMe;
 
-  const MessageWidget({Key? key, required this.message}) : super(key: key);
+  MessageWidget(
+      {Key? key, required this.message, required this.messageFromMe})
+      : super(key: key);
+
+  BorderRadius defaultBorderRadius = const BorderRadius.only(
+      bottomLeft: Radius.circular(10),
+      topRight: Radius.circular(10),
+      bottomRight: Radius.circular(10));
+  BorderRadius messageFromMeRadius = const BorderRadius.only(
+      bottomLeft: Radius.circular(10),
+      topLeft: Radius.circular(10),
+      bottomRight: Radius.circular(10));
 
   @override
   Widget build(BuildContext context) {
     var parsedDateTime = DateTime.fromMillisecondsSinceEpoch(message.time);
     return Container(
-      margin: const EdgeInsets.fromLTRB(5, 0, 100, 5),
+      margin: messageFromMe
+          ? const EdgeInsets.fromLTRB(100, 0, 5, 5)
+          : const EdgeInsets.fromLTRB(5, 0, 100, 5),
       child: Card(
         elevation: 0,
-        color: const Color.fromRGBO(32, 44, 51, 1),
+        color: messageFromMe ? messageGreen : Color.fromRGBO(32, 44, 51, 1),
         shadowColor: Colors.transparent,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(10),
-            bottomRight: Radius.circular(10),
-            topRight: Radius.circular(10),
-          ),
+        shape: RoundedRectangleBorder(
+            borderRadius: messageFromMe ? messageFromMeRadius : defaultBorderRadius
         ),
         child: Container(
           padding: const EdgeInsets.all(10),
           alignment: Alignment.centerLeft,
           child: Column(
             children: [
-              SizedBox(
-                child: Text(
-                  message.senderEmail,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.pinkAccent,
-                  ),
-                ),
-                width: MediaQuery.of(context).size.width,
-              ),
+              messageFromMe
+                  ? SizedBox()
+                  : SizedBox(
+                      child: Text(
+                        message.senderEmail,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.pinkAccent,
+                        ),
+                      ),
+                      width: MediaQuery.of(context).size.width,
+                    ),
               Container(
                 width: MediaQuery.of(context).size.width,
                 padding: EdgeInsets.fromLTRB(5, 5, 0, 5),
