@@ -59,7 +59,11 @@ class _ChatsPageState extends State<ChatsPage> {
             FutureBuilder(
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
+                  return const Expanded(
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
                 }
                 if (snapshot.hasError)
                   return const Text("Could not load chats");

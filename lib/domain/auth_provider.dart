@@ -1,5 +1,6 @@
 
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:chat/domain/user.dart';
 import 'package:flutter/material.dart';
@@ -7,10 +8,10 @@ import 'package:http/http.dart' as http;
 
 class AuthProvider with ChangeNotifier {
 
-  String _baseURL = "https://identitytoolkit.googleapis.com/v1/";
-  String _loginURL = "accounts:signInWithPassword";
-  String _signUpURL = "accounts:signUp";
-  String _apiKey = "KEY";
+  final String _baseURL = "https://identitytoolkit.googleapis.com/v1/";
+  final String _loginURL = "accounts:signInWithPassword";
+  final String _signUpURL = "accounts:signUp";
+  String _apiKey = "[API_KEY]";
 
   User? _user;
 
@@ -28,6 +29,9 @@ class AuthProvider with ChangeNotifier {
           })
       );
       var data = jsonDecode(response.body) as Map<String, dynamic>;
+      if(response.statusCode != 200) {
+        throw HttpException(data["error"]["message"]);
+      }
       var user = User(data["email"] as String);
       _user = user;
       return user;
@@ -52,6 +56,9 @@ class AuthProvider with ChangeNotifier {
           })
       );
       var data = jsonDecode(response.body) as Map<String, dynamic>;
+      if(response.statusCode != 200) {
+        throw HttpException(data["error"]["message"]);
+      }
       var user = User(data["email"] as String);
       _user = user;
       return user;

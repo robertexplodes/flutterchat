@@ -169,7 +169,7 @@ class LoginPage extends StatelessWidget {
       email: email,
       password: password,
       onError: "Sie konntent nicht eingeloggt werden.",
-      onSuccess: "Login erfolgreich",
+      onSuccess: "Login erfolgreich\nSie werden weitergeleitet...",
       context: context,
       authProcess: Provider.of<AuthProvider>(context, listen: false).login,
     );
@@ -207,7 +207,7 @@ class LoginPage extends StatelessWidget {
                       children: [
                         const Icon(Icons.error, color: Colors.red),
                         Text(
-                          onError,
+                          '$onError\n${snapshot.error.toString()}',
                           style: const TextStyle(
                             color: Colors.redAccent,
                             fontSize: 16,
